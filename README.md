@@ -215,3 +215,35 @@ Open on any smartphone: https://bedtime-story-generator-cohort-gules.vercel.app
 - context=[previous_task]: agents pass output to next agent
 - Gemini via SDK: same as Module 1, now inside CrewAI agents
 - New FastAPI route: same pattern as Modules 2-7
+
+
+### Why this is Agentic AI
+
+Regular AI (Modules 1-7): User sends one prompt, gets one response. The LLM is passive.
+
+Agentic AI (Capstone): Multiple agents collaborate, each making independent decisions within their role.
+
+The 4 hallmarks of Agentic AI in this app:
+
+1. Autonomy: Each agent makes its own decisions within its role - the Story Writer decides HOW to write the story, not just follows a template
+2. Goal-directed: Each agent has a specific goal it pursues independently (theme picker, story writer, title maker)
+3. Context awareness: Agents read previous agents outputs via context=[previous_task] and build on them
+4. Sequential reasoning: The pipeline reasons in steps - theme first, then story, then title
+
+This is the foundation. The next level is fully autonomous agentic AI where agents have tools (web search, database) and self-direct their next steps via a ReAct loop.
+
+### Quick Start — Every time you restart your laptop
+
+Step 1: Open WSL terminal (Windows key, type WSL, press Enter)
+
+Step 2: Run these 3 commands:
+
+    cd ~/bedtime-story-generator-cohort
+    source venv/bin/activate
+    uvicorn app.main:app --reload
+
+Step 3: Open the app
+
+    Local API docs:  http://localhost:8000/docs
+    Local frontend:  open frontend/index.html in browser
+    Live on internet (no restart needed): https://bedtime-story-generator-cohort-gules.vercel.app
