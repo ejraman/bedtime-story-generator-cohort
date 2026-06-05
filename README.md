@@ -128,3 +128,90 @@ The walk-through is in **[`docs/publish_your_work.md`](docs/publish_your_work.md
 - **If `psql` errors with `FATAL: database "<your-username>" does not exist`** (you'll first see this in Module 6 when the migration step runs): `$DATABASE_URL` isn't set in your *shell* — Python's `.env` loads into the Python process, not your terminal. Quick fix: `export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/llm_question_log` and re-run. Each per-module README reminds you when it's needed.
 - **If Module 7's deploy returns `FUNCTION_INVOCATION_FAILED`:** Vercel auto-detected the Python backend instead of treating it as a static-only deploy. The fix is in the `.vercelignore` file at the repo root — make sure it ships when you deploy.
 
+
+
+---
+
+## Capstone - Module 8: Multi-Agent Orchestration with CrewAI
+
+**Single fundamental:** A multi-agent pipeline decomposes a complex task into specialised agents that collaborate sequentially, producing richer output than any single LLM call.
+
+### What changed
+
+- app/services/crew_service.py - NEW: 3-agent CrewAI pipeline
+- app/main.py - Added POST /story/crew route (original /story untouched)
+- app/schemas.py - Added CrewStoryResponse(title, story, summary)
+- requirements.txt - Added crewai==0.130.0
+
+### The 3 Agents
+
+Agent 1 - Theme Picker: Reads the child name, characters, setting and plot. Picks one theme (e.g. kindness) and one moral lesson.
+
+Agent 2 - Story Writer: Takes theme and moral from Agent 1. Writes a 150-200 word bedtime story ending peacefully.
+
+Agent 3 - Title Maker: Reads the finished story. Creates a catchy title and one sentence for parents summarising the moral.
+
+### How to rerun after laptop restart
+
+Run these 3 commands in WSL terminal:
+
+    cd ~/bedtime-story-generator-cohort
+    source venv/bin/activate
+    uvicorn app.main:app --reload
+
+Then open http://localhost:8000/docs in your browser.
+
+### Mobile access
+
+Open this URL on any smartphone browser - no installation needed:
+https://bedtime-story-generator-cohort-gules.vercel.app
+
+Works on iOS and Android. The Render backend auto-deployed when you pushed to GitHub.
+
+### Connection to NTU coursework
+
+- Agent role/goal/backstory: Coaching 2.3 AntiGravity CrewAI demo
+- Sequential process: Process.sequential, agents run one after another
+- context=[previous_task]: how agents pass output to the next agent
+- Gemini via SDK: same as Module 1, now inside CrewAI agents
+- New FastAPI route: same pattern as Modules 2-7
+
+
+---
+
+## Capstone - Module 8: Multi-Agent Orchestration with CrewAI
+
+**Single fundamental:** A multi-agent pipeline decomposes a complex task into specialised agents that collaborate sequentially.
+
+### What changed
+- app/services/crew_service.py - NEW: 3-agent CrewAI pipeline
+- app/main.py - Added POST /story/crew route (original /story untouched)
+- app/schemas.py - Added CrewStoryResponse(title, story, summary)
+- requirements.txt - Added crewai==0.130.0
+
+### The 3 Agents
+
+Agent 1 - Theme Picker: Picks one theme and one moral lesson from the child inputs.
+
+Agent 2 - Story Writer: Writes a 150-200 word bedtime story using the theme and moral.
+
+Agent 3 - Title Maker: Creates a catchy title and one parent summary sentence.
+
+### How to rerun after laptop restart
+
+    cd ~/bedtime-story-generator-cohort
+    source venv/bin/activate
+    uvicorn app.main:app --reload
+
+Then open http://localhost:8000/docs
+
+### Mobile access
+
+Open on any smartphone: https://bedtime-story-generator-cohort-gules.vercel.app
+
+### Connection to NTU coursework
+- Agent role/goal/backstory: Coaching 2.3 AntiGravity CrewAI demo
+- Sequential process: Process.sequential
+- context=[previous_task]: agents pass output to next agent
+- Gemini via SDK: same as Module 1, now inside CrewAI agents
+- New FastAPI route: same pattern as Modules 2-7
