@@ -12,6 +12,12 @@ class StoryResponse(BaseModel):
     story: str
 
 
+class CrewStoryResponse(BaseModel):
+    title: str
+    story: str
+    summary: str
+
+
 class StoredStory(BaseModel):
     id: int
     child_name: str
