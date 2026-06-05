@@ -1,51 +1,798 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bedtime Story Generator</title>
-    <link rel="stylesheet" href="/style.css">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bedtime Story Generator ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+<style>
+  /* ── CSS Variables / Themes ─────────────────────────────── */
+  :root {
+    --bg:        #FDF8F2;
+    --surface:   #FFFDF9;
+    --border:    #E8DDD0;
+    --accent:    #C0704A;
+    --accent2:   #7B9E87;
+    --text:      #2C2416;
+    --muted:     #8A7968;
+    --card:      #FFFFFF;
+    --shadow:    rgba(192,112,74,0.12);
+    --crew-bg:   #F0F5F1;
+    --crew-acc:  #4A7C59;
+    --star:      #D4A853;
+    --moon:      #C0704A;
+  }
+  [data-theme="moonlight"] {
+    --bg:        #0D1117;
+    --surface:   #161B22;
+    --border:    #30363D;
+    --accent:    #79C0FF;
+    --accent2:   #56D364;
+    --text:      #E6EDF3;
+    --muted:     #8B949E;
+    --card:      #21262D;
+    --shadow:    rgba(121,192,255,0.15);
+    --crew-bg:   #1C2128;
+    --crew-acc:  #56D364;
+    --star:      #E3B341;
+    --moon:      #79C0FF;
+  }
+  [data-theme="lavender"] {
+    --bg:        #F5F0FF;
+    --surface:   #FAF7FF;
+    --border:    #D8CAFF;
+    --accent:    #7C3AED;
+    --accent2:   #EC4899;
+    --text:      #1E1033;
+    --muted:     #6B5B9A;
+    --card:      #FFFFFF;
+    --shadow:    rgba(124,58,237,0.12);
+    --crew-bg:   #EDE9FF;
+    --crew-acc:  #7C3AED;
+    --star:      #F59E0B;
+    --moon:      #EC4899;
+  }
+  [data-theme="ocean"] {
+    --bg:        #EFF8FF;
+    --surface:   #F7FBFF;
+    --border:    #BAE0FF;
+    --accent:    #0369A1;
+    --accent2:   #0891B2;
+    --text:      #0C2340;
+    --muted:     #4A7FA5;
+    --card:      #FFFFFF;
+    --shadow:    rgba(3,105,161,0.12);
+    --crew-bg:   #E0F2FE;
+    --crew-acc:  #0369A1;
+    --star:      #F59E0B;
+    --moon:      #0891B2;
+  }
+  [data-theme="sakura"] {
+    --bg:        #FFF5F7;
+    --surface:   #FFFBFC;
+    --border:    #FFD6DF;
+    --accent:    #E11D48;
+    --accent2:   #DB2777;
+    --text:      #3D0A17;
+    --muted:     #9F4060;
+    --card:      #FFFFFF;
+    --shadow:    rgba(225,29,72,0.10);
+    --crew-bg:   #FEE2E8;
+    --crew-acc:  #E11D48;
+    --star:      #F59E0B;
+    --moon:      #DB2777;
+  }
+
+  /* ── Reset & Base ───────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    transition: background 0.4s, color 0.4s;
+  }
+
+  /* ── Header ─────────────────────────────────────────────── */
+  header {
+    background: var(--surface);
+    border-bottom: 1.5px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    font-size: 1.8rem;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
+  }
+  .logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .logo-sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── Theme Switcher ─────────────────────────────────────── */
+  .theme-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .theme-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 4px;
+  }
+  .theme-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .theme-btn:hover { transform: scale(1.2); }
+  .theme-btn.active { border-color: var(--text); }
+  .theme-btn[data-t="warm"]     { background: linear-gradient(135deg,#FDF8F2,#C0704A); }
+  .theme-btn[data-t="moonlight"]{ background: linear-gradient(135deg,#0D1117,#79C0FF); }
+  .theme-btn[data-t="lavender"] { background: linear-gradient(135deg,#F5F0FF,#7C3AED); }
+  .theme-btn[data-t="ocean"]    { background: linear-gradient(135deg,#EFF8FF,#0369A1); }
+  .theme-btn[data-t="sakura"]   { background: linear-gradient(135deg,#FFF5F7,#E11D48); }
+
+  /* ── Mode Toggle ────────────────────────────────────────── */
+  .mode-toggle {
+    display: flex;
+    gap: 0;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-left: 16px;
+  }
+  .mode-btn {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    letter-spacing: 0.03em;
+  }
+  .mode-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* ── Main Layout ────────────────────────────────────────── */
+  main {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 65px);
+  }
+
+  /* ── Form Panel ─────────────────────────────────────────── */
+  .form-panel {
+    background: var(--surface);
+    border-right: 1.5px solid var(--border);
+    padding: 32px 28px;
+    overflow-y: auto;
+  }
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .panel-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .field {
+    margin-bottom: 18px;
+  }
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  input, textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 300;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: vertical;
+  }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--shadow);
+  }
+  textarea { min-height: 80px; }
+
+  .generate-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-top: 8px;
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+  }
+  .generate-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+  .generate-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  /* crew mode badge */
+  .crew-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--crew-bg);
+    color: var(--crew-acc);
+    border: 1px solid var(--crew-acc);
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    margin-bottom: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* agent steps */
+  .agent-steps {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .agent-steps.visible { display: flex; }
+  .agent-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--crew-bg);
+    border-radius: 8px;
+    border-left: 3px solid var(--border);
+    transition: border-color 0.3s;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .agent-step.running { border-left-color: var(--star); color: var(--text); }
+  .agent-step.done    { border-left-color: var(--crew-acc); color: var(--crew-acc); }
+  .step-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .agent-step.running .step-dot { background: var(--star); animation: pulse 1s infinite; }
+  .agent-step.done .step-dot    { background: var(--crew-acc); }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.4); opacity: 0.6; }
+  }
+
+  /* past stories */
+  .past-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+  .past-list { display: flex; flex-direction: column; gap: 6px; }
+  .past-item {
+    padding: 9px 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-size: 0.83rem;
+  }
+  .past-item:hover {
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .past-item-name { font-weight: 700; color: var(--accent); }
+  .past-item-date { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── Story Panel ─────────────────────────────────────────── */
+  .story-panel {
+    padding: 40px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    opacity: 0.5;
+    gap: 14px;
+  }
+  .empty-icon { font-size: 4rem; animation: float 4s ease-in-out infinite; }
+  .empty-text { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--muted); }
+
+  .story-card {
+    display: none;
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .story-card.visible { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .story-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .story-meta {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .story-meta-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  .story-body {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.08rem;
+    font-weight: 400;
+    line-height: 1.85;
+    color: var(--text);
+    white-space: pre-wrap;
+    border-left: 3px solid var(--accent);
+    padding-left: 20px;
+    margin-bottom: 28px;
+  }
+
+  .summary-card {
+    display: none;
+    background: var(--crew-bg);
+    border: 1.5px solid var(--crew-acc);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+  }
+  .summary-card.visible { display: block; }
+  .summary-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--crew-acc);
+    margin-bottom: 6px;
+  }
+  .summary-text {
+    font-size: 0.92rem;
+    color: var(--text);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .loading-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 18px;
+  }
+  .loading-state.visible { display: flex; }
+  .loader-moon {
+    font-size: 3rem;
+    animation: spin 2s linear infinite;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .loader-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  .loader-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    opacity: 0.7;
+  }
+
+  .error-msg {
+    display: none;
+    background: #FEE2E2;
+    color: #991B1B;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    margin-top: 12px;
+  }
+  .error-msg.visible { display: block; }
+
+  /* ── Responsive ─────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    main { grid-template-columns: 1fr; }
+    .form-panel { border-right: none; border-bottom: 1.5px solid var(--border); }
+    .story-panel { padding: 24px 20px; }
+    header { padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
+  }
+</style>
 </head>
-<body>
-    <header><h1>Bedtime Story Generator</h1></header>
+<body data-theme="warm">
 
-    <main class="layout">
-        <section class="form-pane" aria-label="Story details">
-            <p class="hint">Tell us about the story you'd like to read tonight.</p>
-            <form id="story-form">
-                <label>
-                    Child's name
-                    <input name="child_name" required placeholder="Aisha">
-                </label>
-                <label>
-                    Characters
-                    <input name="characters" placeholder="an owl and a fox">
-                </label>
-                <label>
-                    Setting
-                    <input name="setting" placeholder="an enchanted forest">
-                </label>
-                <label>
-                    Plot
-                    <input name="plot" required placeholder="looking for the moon">
-                </label>
-                <button id="generate-btn" type="button">Generate story</button>
-            </form>
-            <p id="error" class="error" role="alert"></p>
+<!-- ── Header ──────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+    <span class="logo-icon">🌙</span>
+    <div>
+      <div class="logo-text">Bedtime Story Generator</div>
+      <div class="logo-sub">NTU SCTP Capstone · CrewAI</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div class="theme-bar">
+      <span class="theme-label">Theme</span>
+      <button class="theme-btn active" data-t="warm"      title="Warm Parchment"></button>
+      <button class="theme-btn"        data-t="moonlight" title="Moonlight Dark"></button>
+      <button class="theme-btn"        data-t="lavender"  title="Lavender Dream"></button>
+      <button class="theme-btn"        data-t="ocean"     title="Ocean Calm"></button>
+      <button class="theme-btn"        data-t="sakura"    title="Sakura Pink"></button>
+    </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="classicBtn" onclick="setMode('classic')">Classic</button>
+      <button class="mode-btn"        id="crewBtn"    onclick="setMode('crew')">✨ CrewAI</button>
+    </div>
+  </div>
+</header>
 
-            <aside id="recent-stories" class="recent-stories" hidden>
-                <h2>Past stories</h2>
-                <ul id="recent-list"></ul>
-            </aside>
-        </section>
+<!-- ── Main ────────────────────────────────────────────────── -->
+<main>
 
-        <section class="story-pane" aria-label="Story" aria-live="polite">
-            <div id="story-output" class="story-empty">
-                <p class="placeholder">Your story will appear here.</p>
-            </div>
-        </section>
-    </main>
+  <!-- Form Panel -->
+  <div class="form-panel">
+    <div class="panel-title" id="panelTitle">Tell me about your child</div>
+    <div class="panel-sub"   id="panelSub">Fill in the details and a personalised bedtime story appears on the right.</div>
 
-    <script src="/script.js"></script>
+    <div id="crewBadge" class="crew-badge" style="display:none;">
+      🤖 3-Agent CrewAI Pipeline
+    </div>
+
+    <!-- Agent progress (crew mode only) -->
+    <div class="agent-steps" id="agentSteps">
+      <div class="agent-step" id="step1"><span class="step-dot"></span>Agent 1 · Theme Picker</div>
+      <div class="agent-step" id="step2"><span class="step-dot"></span>Agent 2 · Story Writer</div>
+      <div class="agent-step" id="step3"><span class="step-dot"></span>Agent 3 · Title &amp; Summary</div>
+    </div>
+
+    <div class="field">
+      <label>Child's Name</label>
+      <input type="text" id="childName" placeholder="e.g. Arjun" />
+    </div>
+    <div class="field">
+      <label>Characters</label>
+      <input type="text" id="characters" placeholder="e.g. a friendly dragon, a wise owl" />
+    </div>
+    <div class="field">
+      <label>Setting</label>
+      <input type="text" id="setting" placeholder="e.g. a forest full of glowing mushrooms" />
+    </div>
+    <div class="field">
+      <label>Plot</label>
+      <textarea id="plot" placeholder="e.g. the dragon helps Arjun find his way home"></textarea>
+    </div>
+
+    <button class="generate-btn" id="generateBtn" onclick="generateStory()">
+      ✨ Generate Story
+    </button>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <!-- Past stories -->
+    <div id="pastSection" style="display:none;">
+      <div class="past-label">Past Stories</div>
+      <div class="past-list" id="pastList"></div>
+    </div>
+  </div>
+
+  <!-- Story Panel -->
+  <div class="story-panel">
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📖</div>
+      <div class="empty-text">Your story will appear here</div>
+      <div style="font-size:0.8rem;color:var(--muted);">Fill in the form and click Generate</div>
+    </div>
+
+    <div class="loading-state" id="loadingState">
+      <div class="loader-moon">🌙</div>
+      <div class="loader-text" id="loaderText">Weaving your story...</div>
+      <div class="loader-sub"  id="loaderSub">This may take 30–60 seconds</div>
+    </div>
+
+    <div class="story-card" id="storyCard">
+      <div class="story-title" id="storyTitle"></div>
+      <div class="story-meta"  id="storyMeta"></div>
+      <div class="summary-card" id="summaryCard">
+        <div class="summary-label">💡 For Parents</div>
+        <div class="summary-text" id="summaryText"></div>
+      </div>
+      <div class="story-body" id="storyBody"></div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ── Config ──────────────────────────────────────────────────
+const BACKEND = 'http://localhost:8000';
+let currentMode = 'classic';
+
+// ── Theme switcher ───────────────────────────────────────────
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const t = btn.dataset.t;
+    document.body.dataset.theme = t === 'warm' ? 'warm' : t;
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// ── Mode switcher ────────────────────────────────────────────
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('classicBtn').classList.toggle('active', mode === 'classic');
+  document.getElementById('crewBtn').classList.toggle('active', mode === 'crew');
+  document.getElementById('crewBadge').style.display = mode === 'crew' ? 'inline-flex' : 'none';
+  document.getElementById('agentSteps').classList.toggle('visible', mode === 'crew');
+  if (mode === 'crew') {
+    document.getElementById('panelTitle').textContent = 'Multi-Agent Story';
+    document.getElementById('panelSub').textContent = '3 CrewAI agents collaborate: Theme Picker → Story Writer → Title Maker.';
+    document.getElementById('generateBtn').textContent = '🤖 Run CrewAI Pipeline';
+  } else {
+    document.getElementById('panelTitle').textContent = 'Tell me about your child';
+    document.getElementById('panelSub').textContent = 'Fill in the details and a personalised bedtime story appears on the right.';
+    document.getElementById('generateBtn').textContent = '✨ Generate Story';
+  }
+  resetAgentSteps();
+}
+
+// ── Agent step animations (crew mode) ───────────────────────
+function resetAgentSteps() {
+  ['step1','step2','step3'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('running','done');
+  });
+}
+
+function animateAgents(callback) {
+  resetAgentSteps();
+  const steps = ['step1','step2','step3'];
+  const delays = [0, 15000, 30000]; // approximate timing
+  steps.forEach((id, i) => {
+    setTimeout(() => {
+      steps.slice(0,i).forEach(prev => {
+        document.getElementById(prev).classList.remove('running');
+        document.getElementById(prev).classList.add('done');
+      });
+      document.getElementById(id).classList.add('running');
+    }, delays[i]);
+  });
+}
+
+// ── Generate story ───────────────────────────────────────────
+async function generateStory() {
+  const childName  = document.getElementById('childName').value.trim();
+  const characters = document.getElementById('characters').value.trim();
+  const setting    = document.getElementById('setting').value.trim();
+  const plot       = document.getElementById('plot').value.trim();
+  const errorEl    = document.getElementById('errorMsg');
+
+  if (!childName || !plot) {
+    showError("Please fill in at least the child's name and the plot.");
+    return;
+  }
+
+  errorEl.classList.remove('visible');
+  showLoading();
+  document.getElementById('generateBtn').disabled = true;
+
+  if (currentMode === 'crew') {
+    document.getElementById('loaderText').textContent = 'Three agents are crafting your story...';
+    document.getElementById('loaderSub').textContent = 'Agent 1 picks a theme · Agent 2 writes · Agent 3 titles';
+    animateAgents();
+  } else {
+    document.getElementById('loaderText').textContent = 'Weaving your story...';
+    document.getElementById('loaderSub').textContent = 'This may take a few seconds';
+  }
+
+  const endpoint = currentMode === 'crew' ? '/story/crew' : '/story';
+
+  try {
+    const res = await fetch(BACKEND + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ child_name: childName, characters, setting, plot })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Server error ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    // Mark all agents done
+    if (currentMode === 'crew') {
+      ['step1','step2','step3'].forEach(id => {
+        document.getElementById(id).classList.remove('running');
+        document.getElementById(id).classList.add('done');
+      });
+    }
+
+    showStory(data, childName, characters, setting);
+    loadPastStories(childName);
+
+  } catch (err) {
+    showError(err.message || 'Could not connect to the backend. Is uvicorn running?');
+    showEmpty();
+    resetAgentSteps();
+  }
+
+  document.getElementById('generateBtn').disabled = false;
+}
+
+// ── Display helpers ──────────────────────────────────────────
+function showEmpty() {
+  document.getElementById('emptyState').style.display = 'flex';
+  document.getElementById('loadingState').classList.remove('visible');
+  document.getElementById('storyCard').classList.remove('visible');
+}
+
+function showLoading() {
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('loadingState').classList.add('visible');
+  document.getElementById('storyCard').classList.remove('visible');
+}
+
+function showStory(data, childName, characters, setting) {
+  document.getElementById('loadingState').classList.remove('visible');
+  document.getElementById('emptyState').style.display = 'none';
+
+  const title   = data.title   || `${childName}'s Bedtime Story`;
+  const story   = data.story   || '';
+  const summary = data.summary || '';
+
+  document.getElementById('storyTitle').textContent = title;
+  document.getElementById('storyMeta').innerHTML =
+    `<span>${childName}</span>
+     <span class="story-meta-dot"></span>
+     <span>${characters || 'original characters'}</span>
+     <span class="story-meta-dot"></span>
+     <span>${setting || 'a magical place'}</span>`;
+  document.getElementById('storyBody').textContent = story;
+
+  const sumCard = document.getElementById('summaryCard');
+  if (summary && currentMode === 'crew') {
+    document.getElementById('summaryText').textContent = summary;
+    sumCard.classList.add('visible');
+  } else {
+    sumCard.classList.remove('visible');
+  }
+
+  document.getElementById('storyCard').classList.add('visible');
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+// ── Past stories ─────────────────────────────────────────────
+async function loadPastStories(childName) {
+  if (!childName) return;
+  try {
+    const res = await fetch(`${BACKEND}/stories?child_name=${encodeURIComponent(childName)}`);
+    if (!res.ok) return;
+    const stories = await res.json();
+    if (!stories.length) return;
+
+    document.getElementById('pastSection').style.display = 'block';
+    const list = document.getElementById('pastList');
+    list.innerHTML = '';
+    stories.slice(0, 5).forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'past-item';
+      const date = new Date(s.created_at).toLocaleDateString('en-SG', { day:'numeric', month:'short', year:'numeric' });
+      item.innerHTML = `<div class="past-item-name">${s.child_name}</div>
+                        <div class="past-item-date">${s.plot?.slice(0,60)}... · ${date}</div>`;
+      item.onclick = () => {
+        showStory({ title: `${s.child_name}'s Story`, story: s.body, summary: '' },
+                    s.child_name, s.characters, s.setting);
+      };
+      list.appendChild(item);
+    });
+  } catch(e) { /* silently fail */ }
+}
+
+// Load past stories when name field loses focus
+document.getElementById('childName').addEventListener('blur', () => {
+  loadPastStories(document.getElementById('childName').value.trim());
+});
+</script>
 </body>
 </html>
