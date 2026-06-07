@@ -20,3 +20,5 @@ httpx==0.27.*                # Module 0 only (Ollama HTTP client); Module 1 swap
 psycopg[binary]==3.2.*
 python-dotenv==1.0.*
 google-genai>=1.0.0           # Modules 1–7 (hosted LLM via SDK)
+
+crewai==0.130.0
